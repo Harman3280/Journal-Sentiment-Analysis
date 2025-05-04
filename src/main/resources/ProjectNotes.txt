@@ -1,0 +1,660 @@
+
+
+############ DEPENDENCIES ---
+
+<!--    SpringBoot 2.7.16 works with spring security 5 and Java 1.8 or higher
+and     SpringBoot 3.x works with spring security 6 and Java 17 or higher-->
+
+1. Spring-Boot-Starter-Data-Mongodb :
+    provides interface, methods and their implementations for CRUD on mongo db in spring boot app.
+
+2. Project LOMBOK :
+    Reduce Boilerplate code and generates constructors, G&S etc on compilation based on annotations on POJOs
+    LOMBOK generates bytecode for methods like G&S, constructors, hashcode() as specified by annotations on POJOs and add this to pur compiled class files(.class files)
+
+3. spring-boot-starter-security :
+    Used for Authentication and Authorization in Spring apps
+
+4. spring-boot-starter-mail :
+    Java Mail Sender
+
+5.  Kafka Dependency for our spring boot project
+
+            <dependency>
+               <groupId>org.springframework.kafka</groupId>
+               <artifactId>spring-kafka</artifactId>
+           </dependency>
+
+
+########## Mongo DB ###########
+
+    MongoDB Atlas credentials, on AWS
+
+    Name : Cluster0
+    Username : harmansingh
+    Pass : harman123
+
+    brew services start mongodb-community@8.0  --  For running Mongo as a macOS service
+
+    mongodb --config /opt/homebrew/etc/mongod.conf --  For running Mongo as a manual background service
+
+    MongoDB structure --   MYSQL
+        Collection        ----- Table
+        Documents        ------- Rows
+        Fields          -------- Columns
+
+
+E.g.
+
+            test> show dbs
+            admin   40.00 KiB
+            config  12.00 KiB
+            local   72.00 KiB
+            test> use school
+            switched to db school
+            school> show collections
+
+            school> db.students.insertOne({ "name" : "Nitin", "Age" : 25})
+            {
+              acknowledged: true,
+              insertedId: ObjectId('67bc2db9fc83b78e2a496279')
+            }
+            school> db.students.insertOne({ "name" : "AK", "Age" : 22})
+            {
+              acknowledged: true,
+              insertedId: ObjectId('67bc2dccfc83b78e2a49627a')
+            }
+            school> show collections
+            students
+            school> db.students
+            school.students
+            school> db.students.find().pretty()
+            [
+              { _id: ObjectId('67bc2db9fc83b78e2a496279'), name: 'Nitin', Age: 25 },
+              { _id: ObjectId('67bc2dccfc83b78e2a49627a'), name: 'AK', Age: 22 }
+            ]
+            school>
+
+##########  ORM  -> Object-Relational Mapping
+ -- Is a way/technique to map Java Objects to DB tables.
+ -- allows the devs to work with db using oops concepts instead of writing raw SQL queries and making it easier to interact with relational dbs.
+ -- E.g. User Entity/class to be persisted and a User table, now ORM framework like hibernate can map fields of User class with User table columns.
+    and make it easier to do crud operations.
+
+##########  JPA - JAVA Persistence(to store permanently) API(set of rule)
+
+1. JPA is a way to achieve ORM, it includes interfaces and annotations that you use in your Java classes, it requires a persistence provider (ORM tools) for implementation.
+2. JPA is a Java specification for managing relational data in Java applications. It provides an abstraction over JDBC, allowing developers to work with database entities using object-relational mapping (ORM).
+3. To use JPA, you need a "Persistence Provider". A persistence provider is a specific implementation of the JPA specification. Examples of JPA persistence providers include Hibernate, EclipseLink, and OpenJPA.
+    These providers implement the JPA interfaces and provide the underlying functionality to interact with databases.
+4. JPA is primarily designed for working with relational databases, where data is stored in tables with a predefined schema. MongoDB, on the other hand, is a NoSQL database that uses a different data model, typically based on collections of documents, which are schema-less or have flexible schemas. This fundamental difference in data models and storage structures is why
+   JPA is not used with MongoDB.
+
+
+###### GenerationType
+
+   @Id  // Marks this field as the Primary Key
+   @GeneratedValue(strategy = GenerationType.IDENTITY)  // Defines the strategy for generating the primary key
+   private Long id;
+
+
+   1️⃣ GenerationType.IDENTITY (Auto-Increment)
+
+       The database automatically generates the primary key using auto-increment.
+       It relies on the database to generate unique values.
+       Works with databases that support AUTO_INCREMENT (e.g., MySQL, PostgreSQL, SQL Server
+
+   2️⃣ GenerationType.SEQUENCE (Database Sequence)
+
+       Uses a database sequence to generate unique primary key values.
+       Recommended for databases that support SEQUENCE (e.g., PostgreSQL, Oracle, H2).
+       It provides better performance for batch inserts than IDENTITY.
+
+   3️⃣ GenerationType.TABLE (Table-Based ID Generation)
+
+       Uses a separate database table to store and generate unique primary key values.
+       Not commonly used due to performance overhead.
+       Works with any database (even those without IDENTITY or SEQUENCE).
+
+   4️⃣ GenerationType.AUTO (Let JPA Decide)
+
+       JPA automatically chooses the best strategy based on the database.
+       Typically, it picks:
+           IDENTITY for MySQL.
+           SEQUENCE for PostgreSQL & Oracle.
+           TABLE if no better option is available.
+
+
+#########   Spring Data JPA ########
+
+1. Spring Data JPA is built on top of the JPA (Java Persistence API) specification,
+    but it is not a JPA implementation itself. Instead,
+    it simplifies working with JPA by providing higher-level abstractions and utilities.
+    However, to use Spring Data JPA effectively, you still need a JPA implementation, such as Hibernate, EclipseLink, or another JPA-compliant provider, to handle the actual database interactions.
+
+
+#########   Spring-Boot-Starter-Data-Mongodb ########
+
+ --- This lib provides MongoRepository Interface which provides standard CRUD operations
+ --- It already implements CRUD Repository and provides a bean(implementation of the MongoRepository class) at runtime.
+
+
+######### Response Entity (ResponseEntity<T>) in Spring Boot && HTTP STATUS CODES ?
+
+--In Spring Boot, ResponseEntity<T> is a class that represents/customize an HTTP response, including status code, headers, and body.
+-- we can also use it to return diff types of data in our controller methods, such as JSON, XML, HTML.
+--It allows you to customize responses when handling REST API requests.
+
+    ## HTTP STATUS CODES ##
+    1. 3 digits, returned by web server as part of response, used to convey info about the result of the requested operation.
+    2. 5 categories, 1xx(Informational), 2xx(Successful), 3xx(Redirection), 4xx(Client Error), 5xx(Server Error)
+
+######### Playing with RESPONSEENTITY CLASS ###############
+
+✅ 1. ResponseEntity.ok(...)
+
+            Shorthand for returning 200 OK with a body:
+
+            return ResponseEntity.ok(user);
+
+            → Equivalent to:
+
+            return new ResponseEntity<>(user, HttpStatus.OK);
+
+🚫 2. ResponseEntity.notFound()
+
+            Shorthand for returning 404 Not Found:
+
+            return ResponseEntity.notFound().build();
+
+            → Equivalent to:
+
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+❌ 3. ResponseEntity.badRequest()
+
+            Shorthand for returning 400 Bad Request:
+
+            return ResponseEntity.badRequest().build();
+
+            → You can also include a body:
+
+            return ResponseEntity.badRequest().body("Invalid input");
+
+🔐 4. ResponseEntity.status(HttpStatus)
+
+        Custom status code with/without body:
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+
+        → Useful when returning 201 Created, 403 Forbidden, 500 Internal Server Error, etc.
+        🛠️ 5. With headers (chainable)
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Custom-Header", "value");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(data);
+
+Bonus 💡
+
+        You can chain multiple things:
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .header("Location", "/api/users/123")
+                .body(createdUser);
+
+
+#######  Indexing of username in MongoDB ####
+
+    @Indexed(unique = true) --> this will create a index of username in users table, but by default spring will not create the index.
+    @NonNull
+    private String username;
+
+    So we need to add a property --> spring.data.mongodb.auto-index-creation=true
+
+######## ACTUATORS #################
+
+1.  In Spring Boot, Actuators are a set of built-in endpoints (LIKE /actuator/health)that help monitor and manage a Spring Boot application.
+2.  They provide insights into the health, metrics, environment, and other runtime details of an application.
+3.  Part of the Spring Boot Starter Actuator module
+
+    How to Enable Actuators in Spring Boot?
+
+    1. Add Dependency in pom.xml -- spring-boot-starter-actuator
+    2. 
+
+
+########################################### SPRING SECURITY ###############################
+
+    Before applying SSec to our application, we were just passing userid/userdetails in get or post method, there were no password for authentication
+
+   1. Spring Security is a powerful and highly customizable security framework that is often
+        used in Spring Boot applications to handle authentication and authorization.
+
+        Authentication -- process of verifying user's identity
+        Authorization  -- process of granting or denying access to specific resources (like db table)
+                          or actions(like read/write) based on user's roles & permissions
+
+   2.   Add dependency  spring-boot-starter-security,
+        -- after we add this dependency, springboot's "Auto-configuration" feature will automatically apply security to our application.
+        -- all endpoints are secured now, Spring sec generate a default username & password and print on console.
+        -- By Default Spring Security uses "HTTP Basic Authentication", Now the client sends an Authorization header,
+            Authorization : Basic<encoded-string>. our encodedString is a base64 endcoded string of username:password.
+            the server decides the string, extract, uname & password & verifies them. if ok then access granted otherwise, "Unauthorized" response is sent.
+
+   3.   Basic Authentication, by its design, is stateless, But
+            Some applications do mix Basic Authentication with session management for various reasons. This isn't standard behavior and requires additional setup and logic.
+            In such scenarios, once the user's credentials are verified via Basic Authentication, a session might be established, and the client is provided a session cookie.
+            This way, the client won't need to send the Authorization header with every request, and the server can rely on the session cookie to identify the authenticated user.
+
+   4.   When you log in with Spring Security, it manages your authentication across multiple requests, despite HTTP being stateless.
+
+           1. Session Creation: After successful authentication, an HTTP session is formed. Your authentication details are stored in this session.
+           2. Session Cookie: A JSESSIONID cookie is sent to your browser, which gets sent back with subsequent requests, helping the server recognize your session.
+           3. SecurityContext: Using the JSESSIONID, Spring Security fetches your authentication details for each request.
+           4. Session Timeout: Sessions have a limited life. If you're inactive past this limit, you're logged out.
+           5. Logout: When logging out, your session ends, and the related cookie is removed.
+           6. Remember-Me: Spring Security can remember you even after the session ends using a different persistent cookie (typically have a longer lifespan) .
+           In essence, Spring Security leverages sessions and cookies, mainly JSESSIONID, to ensure you remain authenticated across requests.
+
+   5. Currently, when we setup our app, our username & password are saved in plaintext, we will encode them also
+        -- We want our Spring Boot application to authenticate users based on their credentials stored in a MongoDB database.
+        -- This means that our users and their passwords (hashed) will be stored in MongoDB, and when a user tries to log in,
+            the system should check the provided credentials against what's stored in the database.
+
+        a.  A User entity to represent the user data model.
+        b.  A repository UserRepository to interact with MongoDB.
+        c.  UserDetailsService implementation to fetch user details.
+        d.  A configuration SecurityConfig to integrate everything with Spring Security.
+
+   6. This project is working on Spring boot 2.x which works with Spring security 5.x and Java 8. All the config is added in SpringSecurityConfig class.
+   7. We enable Role based Auth using hasRole on "/admin" URI paths.
+
+   8. To get the name of the logged-in User we make use of SecurityContext class provided by Spring Framework.
+        E.g.
+                    Authentication authentication =  SecurityContextHolder.getContext().getAuthentication();
+                     userRepository.deleteByUserName(authentication.getName());
+
+
+
+
+
+########### Different Wasys of adding Properties in SpringBoot app ########
+
+    1. application.properties -- SpringBoot automatically adds its filePath in its CLASSPATH
+    2. application.yml -- YAML ain't markup language
+    3. on command line -- E.g. java -jar .\Journal-1.0-SNAPSHOT.jar --server.port=9090
+        (Can also be configured in key value pair in EditConfiguration in IntellIJ below Build and Run option)
+
+    If all the properties file ways are present, the priorities are given in Below order
+        Command Line > application.properties > application.yml
+
+############### JUNIT - UNIT Testing ####################
+
+ ** Refer Class : UserServiceTests.java
+
+1. Dependency :
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>3.8.1</version>
+                <scope>test</scope>
+            </dependency>
+
+        -- scope>test</scope> -- tells the spring boot app to include this dependency only during Testing phase, not during JAR creation.
+
+        -- If we use mvn test, then surefire-plugin is used which is already include in spring-boot-starter-parent dependency
+
+2.  @SpringBootTest -- tells the spring Boot to to bootstrap the entire Spring Boot application context for testing.
+               It allows you to load the complete application context and test components like controllers, services, and repositories in an integrated environment.
+
+
+               If you want to start a test with a specific configuration, use:
+                    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+               This starts an embedded server on a random port, useful for testing REST APIs.
+
+     🔹 Common Issues
+     1️⃣ Slow Test Execution
+         Since @SpringBootTest loads the entire Spring context, tests might run slower.
+         📌 Solution: Use @WebMvcTest for lightweight tests of controllers.
+
+     2️⃣ Database Connection Issue
+     If your app relies on a database, the test may fail if the database isn’t available.
+     📌 Solution: Use an in-memory database like H2 for testing.
+
+     🔹 When Not to Use @SpringBootTest?
+
+         For unit tests (mock dependencies instead).
+         For testing a single class (use @Test with @MockBean or @Mock).
+         For controller tests (use @WebMvcTest).
+
+     🚀 Conclusion
+
+         @SpringBootTest is great for integration testing but slow for unit tests.
+         Prefer @WebMvcTest for controller tests and mocking for service tests.
+
+
+3. @Test -- The @Test annotation is used in JUnit (primarily JUnit 4 and 5) to mark a method as a test case.
+            This tells the testing framework that the method should be executed as a unit test.
+
+   ** Refer Class : UserServiceTests.java
+
+4. If we want to give parametrized args to the test method we use, @ParameterizedTest with
+        a. @ArgumentsSource(UserArgumentsProvider.class) or
+        b. @CsvSource({
+                       "1,1,2",
+                       "2,10,2",
+                       "3,2,9"
+               })
+               or
+        c.  @ValueSource(strings = {"ram", "Rohan", "Karan"})
+
+5. If we need to show CodeCoverage for TestCases, we use "Code Coverage for java" Plugin in IntellIJ.
+
+############## MOCKITO ##########################
+
+    *  Refer UserDetailsServiceImplTests.java *
+1. Why use Mockito -- as we don't need to create db connection for testing our code which takes to boot up the whole application, and it also takes lot of time.
+        So mockito helps us to mock these services nd repos.
+
+   There are 2 cases using Mockito,
+   Case 1 : When we want our spring context is booted and its beans are used in the test cases.
+
+   -- Then the class for which we are writing testcases, First we use @SpringBootTest ( UserDetailsServiceImplTests ) on our Test class,
+        second we @Autowired the class we are testing ( UserDetailsServiceImpl )
+        and then we use @MockBean ( UserRepository ) on all the dependencies used in that class.
+        Although these dependencies are Autowired in the MainTestClass, but after using @MockBean, there beans will be replaced by the Mockbeans
+
+        E.g.
+
+
+            @SpringBootTest
+            public class UserDetailsServiceImplTests {
+
+                @Autowired
+                UserDetailsServiceImpl userDetailsService;
+
+                @MockBean
+                private UserRepository userRepository;
+
+   Case 2 : We don't want Spring Context, we just need to mock the services and dependencies.
+        -- Then we REMOVE @SpringBootTest.
+        -- Use @InjectMocks on the class to be tested ( UserDetailsServiceImpl )
+        -- Use @Mock on other classes for Injecting dependencies for this class.
+        -- As we are mocking dependencies here and spring context is not initialized, we need to initialize their beans
+            in @BeforeEach annotated method
+
+        E.g.
+            public class UserDetailsServiceImplTests {
+
+                @InjectMocks
+                UserDetailsServiceImpl userDetailsService;
+
+                @Mock
+                private UserRepository userRepository;
+
+                 @BeforeEach
+                 void setUp(){
+                     MockitoAnnotations.initMocks(this);
+                 }
+
+   Case 3 : When we want some dependencies to be mock nd some to be Autowired, then we use case 1 steps
+
+################## Profiling ##########################
+
+1. If we have 2 application.properties files, then in IntelliJ we can set below property in EditConfiguration > Environment Variables.
+    -- spring.profiles.active = dev
+    In our project as we are using spring context in TestCases and it don't know which property file to pick,so mvn clean package won't create jar
+    So we need to first do mvn clean and then run mvn clean package -D spring.profiles.active = dev
+
+    java -jar ./Journal-1.0-SNAPSHOT.jar --spring.profiles.active=true
+
+2. We can also configure whether to load a bean or not based on Profiling by using @Profile("dev") on the Class.
+3. We can do the same with TestCase classes to enable which properties to be used, by using @ActiveProfile("prod") on the class.
+
+#########  @Profile Annotation #########
+
+    It allows us to inject a bean only when particular profile is set.
+    Basically control the injection of bean using @Profile
+
+    E.g. https://www.youtube.com/shorts/SkBCsTVtqO4
+        @Component
+        @Profile("prod")
+        public classs NoSqlConnection{
+        .....
+        }
+
+    and in our application properties : spring.profiles.active= prod
+################## Logging ################
+
+We can don logging using
+1. Logback: A popular logging framework that serves as the default in many Spring Boot applications. It offers a flexible configuration and good performance.
+2. Log4j2: Another widely used logging framework with features such as asynchronous logging and support for various output formats.
+3. Java Util Logging (JUL): The default logging framework included in the Java Standard Edition. While it's less feature-rich than some third-party frameworks, it is straightforward and is part of the Java platform.
+
+
+--  Spring Boot comes with a default logging configuration that uses Logback as the default logging implementation.
+--  It provides a good balance between simplicity and flexibility.
+--  The default configuration is embedded within the Spring Boot libraries, and it may not be visible in your project's source code.
+--  If we want to customize the logs config, we need to create a logback.xml in resources folder and add config there.
+
+    Using SL4j--
+    E.g.
+            private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+            -- Give arguments in braces as E.g   logger.error("Error for username {}", user.getUserName(),e);
+
+-- Use @Slf4j, to avoid instance creation from LoggerFactory, lombok will create its instance for us.
+    then use log instead of logger in syntax.
+
+-- Spring Boot allows us to configure configure logging using properties or YAML files.
+    E.g.
+        logging:
+          level:
+            org:
+              example: DEBUG
+
+    E.g --  To set logging at base package
+           logging:
+             level:
+               root: DEBUG or(OFF)
+
+    E.g --  To set class level logging
+               logging:
+                 level:
+                   org:
+                    example:
+                        service:
+                            UserService: ERROR
+
+-- As compared to setting logging config in properties or YAML, xml configuration is more widely used.
+    E.g. src/main/resources/logback.xml
+
+############# SONARQUBE #############
+
+-- Why ?
+    to check if our code matches CODE STANDARDS, Follow CLEAN CODE, Quality code, Bug free, Highly Manageable.
+
+
+############# EXTERNAL API INTEGRATION #############
+
+RestTemplate is a synchronous HTTP client provided by Spring Framework that allows your application to communicate with other services via HTTP requests (GET, POST, PUT, DELETE, etc.).
+
+It is commonly used in Spring Boot applications to consume RESTful web services.
+✅ Why Use RestTemplate?
+
+    Simplifies HTTP Communication: No need to write boilerplate code for setting up connections, headers, or parsing responses.
+
+    Integrates Well with Spring: Works well with Spring features like dependency injection.
+
+    Supports Various HTTP Methods: GET, POST, PUT, DELETE, etc.
+
+    Handles Serialization/Deserialization: Converts JSON/XML to Java objects and vice versa using HttpMessageConverters.
+
+The process of converting JSON response into corresponding java object is called DESERIALIZATION.
+
+
+E.g.
+        @Autowired
+        RestTemplate restTemplate;
+
+
+########### HEADERS ##############
+
+HTTP headers are key-value pairs sent between the client and server that carry metadata about the request or the response.
+They help in:
+--    Authentication
+--   Content negotiation
+--  Caching
+--   Encoding
+--   Custom application info
+
+🧾 Common HTTP Request Headers
+        Header	Description
+        Content-Type	Type of the request body (e.g., application/json)
+        Accept	Type of response the client expects
+        Authorization	Contains credentials like Bearer tokens
+        User-Agent	Info about the client (browser, app, etc.)
+        Cache-Control	How the response should be cached
+        Custom-Header	Custom-defined headers like X-App-Token, etc.
+
+-- E.g. with RestTemplate below and in WeatherService.java
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer your_token_here");
+
+        User user = new User("Alice", "alice@example.com");
+
+        // Wrap body and headers into HttpEntity<User> request = new HttpEntity<>(user, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(
+            "https://example.com/api/users",
+            request,
+            String.class
+        );
+
+################# Some Annotations ###########
+
+1. @JsonProperty -- When we want to save json property in other java variable with different name, as java uses camelCase.
+
+        @JsonProperty("weather_descriptions")
+        private List<String> weatherDescriptions;
+
+2. @Value -- To Access environment variable via variables
+
+
+    /* This variable should be non-static to work with @Value, bcz Spring don't change static variable as it is common to a class,
+       if changed changes may impact value access to other instances of class
+     */
+     SYNTAX :
+
+    @Value("${weather.api.key}")
+    private String apiKey = "32aebc252d492117abb932062109971c";
+
+3. @PostConstruct -- Applied and Used on method in Spring
+
+    Usage : As soon as the bean is created for a class, the method with @PostConstruct is invoked
+
+    Some things or configuration which are frequently used and frequently changed can be stored in
+    1. DataBase (But increase latency as a DB call),
+    2. Application Property
+
+    -- As fetching from DB increase latency and saving in property file make our app less flexible, So we can create a APPCache service
+    -- which loads the initial configuration on application startup.
+    -- We use @PostConstruct on method to fetch config at app boot up.
+    -- There maybe a case that some config are changed in DB but the application is already running with old config and
+        it takes too much time to rerun the app. So we can expose an API endPoint which reInitialize our APPCache.
+        E.g. AdminController > clearAppCache(){}
+
+
+
+
+############### CRITERIA in Mongo ########
+
+    1. For interacting with DB we use MongoRepository, but we need to learn the order and way how to write which method for different queries
+    2. MongoRepository is an interface which provides an impl class at runtime for the method which we write in our repository like findByUserName
+    3. Now for writing complex queries we can't use this, So we use Criteria
+    4. Criteria and Query goes hand in hand. We can add criteria like query.addCriteria()
+
+    When we want to write complex queries we use Criteria. E.g in UserRepositoryImpl.java
+
+
+########### Sending Email in SpringBoot using Java Mail Sender ############
+
+    Dependency :
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-mail</artifactId>
+                </dependency>
+    1. JavaMailSender is an interface, when we autowired it in a service, its bean is only created when we have above dependency and below properties set.
+        Otherwise, it will throw error for cant create bean for JavaMailSender.
+    2.Properties added in dev profile properties file
+    3. Created EmailService for example
+    4. Created EmailServiceTests for testing the feature.
+
+
+
+########### CRON Jobs in SpringBoot ############
+
+    1. We can schedule a job to run at a particular time or on some intervals by simply annotating it with
+        @Schedule on the method which is to be executed and using @EnableScheduling on our Main Class.
+
+    2. Example in UserScheduler.java
+
+
+
+############ REDIS #############
+Check Your Java interview Prep doc on Google Docs for detail.
+
+    1. In memory DB : Means stores data in RAM rather than ROM (HDD).
+    2. Data is fetched in Nano seconds
+
+    3. Install Dependency
+    :  <artifactId>spring-boot-starter-data-redis</artifactId>
+
+    4. Install Redis on the system Using homeBrew and start stop redis
+    brew services start redis, brew services stop redis, red-cli, red-server
+
+    5. Adding properties in Application.yml file
+        spring.redis.host and spring.redis.port
+        E.g.
+            spring:
+              redis:
+                host: localhost
+                port: 6379
+
+        RedisCloud config added in application.yml file
+
+
+    6. To interact with Redis, Spring provides us "RedisTemplate"
+
+
+
+
+
+
+
+
+
+
+
+
+---------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^---------------------
+
+    Faced Issues:
+   1. Could not save journal Entry
+        JournalEntry class should also have @NoArgsConstructor with @Data coz while deserealizing from JSON to POJO if only @RequiredArgsConstructor it will be used, so we need to use @NoArgsConstructor also.
+
+        Fix : Add @NoArgsConstructor on POJO class
+
+   2.  Error creating bean of Mongo Template
+        Unsatisfied dependency expressed through method 'mongoTemplate' parameter 0; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'mongoDatabaseFactory' defined in class path resource [org/sp
+
+        Fix : add correct mongo dependency :     <artifactId>mongodb-driver-sync</artifactId>
+
+

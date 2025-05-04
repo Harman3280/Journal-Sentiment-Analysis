@@ -1,0 +1,33 @@
+
+# starttls.enable property tells whether the data which is exchanged between our machine/app and email-server should be encrypted or not
+# auth.enable property that authentication is required from our application to connect to email-server. Maybe email-server is on local machine or this machine has been whitelisted by our email-server on remote in that case auth.enable will be false
+# this username's password is created in my 2FA > App passwords
+
+#  MONGODB  PROPERTY
+#  SMTP PROPERTY FOR JAVAMAILSENDER
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://harmansingh:harman123@cluster0.syb8f.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: journaldb
+      auto-index-creation: true
+  mail:
+      host: smtp.gmail.com
+      port: 587
+      username: singhharman336@gmail.com
+      password: xrcu utrs fndy nxyi
+      properties:
+        mail:
+          smtp:
+            auth: true
+            starttls:
+              enable: true
+
+
+
+server:
+  port: 9191
+  application:
+    name: JournalApp1
+
+

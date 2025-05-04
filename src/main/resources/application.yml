@@ -1,0 +1,26 @@
+
+server:
+  port: 9191
+  application:
+    name: JournalApp_Main
+
+spring:
+#  REDIS PROPERTY
+  redis:
+    host: redis-14703.crce179.ap-south-1-1.ec2.redns.redis-cloud.com
+    port: 14703
+    password: 3YTmrRMh0UY6WgKl4awEijLiq1TNffKV
+#  ACTIVE PROFILE PROPERTY
+  profiles:
+    active: dev
+
+
+
+logging:
+  level:
+    org:
+      example: DEBUG
+
+weather:
+  api:
+    key: 32aebc252d492117abb932062109971c

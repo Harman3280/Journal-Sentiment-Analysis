@@ -1,0 +1,113 @@
+
+Apache Kafka is a distributed event streaming platform used for building real-time data pipelines (A pipeline is a system that captures, process and delivers data as soon as it is generated with minimal latency)
+and streaming applications. It is designed to be fast, scalable, durable, and fault-tolerant.
+
+Kafka CLuster :
+    It is group of Kafka broker
+
+Kafka Broker :
+    A Kafka Server that stores and manages topic partitions.
+    A Kafka server that stores data and serves clients (producers and consumers).
+
+Topic :
+    Specifies the category of the message/data sent by Producer.
+    Named container for similar events. Unique identifier of a topic is its name.
+    📝 Example:
+        Topic: order-events, used to publish and consume order-related data.
+
+    Example: Student topic will have student related data, Food Topic will have food related data.
+    They are like tables in a database.
+    They live inside a broker.
+    Producer produce a message into the topic ( ultimately to partitions in round-robin fashion) or directly to the partitions. Consumer poll continuously for new messages using the topic name.
+
+Partition
+    Topics are divided into partitions.
+    Messages in a partition are strictly ordered. Each partition is an ordered, immutable sequence of records.
+    Each partition can be consumed by only one consumer in a group at a time.
+    These allows Horizontal Scaling.
+    Partitions is where actually the message is located inside the topic.
+    Therefore, while creating a topic, we need to specify the number of partitions ( the number is arbitrary and can be changed later ).
+
+    Each partition is independent of each other.
+    Each message gets stored into partitions with an incremental id known as its Offset value.
+    Ordering is there only at partition level. ( so if data is to be stored in order then do it on same partition)
+    Partition continuously grows (offset increases) as new records are produced.
+    All the records exist in distributed log file.
+
+
+    If we are sending data without Keys, then Partitioner push data to partitions in Round-Robin fashion.
+    If we are sending data with Keys, then Partitioner applies Hashing with data to find partition and  push data to that partition.
+    So Same Key --> Same Partition
+
+    When sending messages with key, ordering will be maintained as they will be in the same partition.
+    without key we can not guarantee the ordering of message as consumer poll the messages from all the partitions at the same time.
+
+Consumer Offset
+    It tells the position of the consumer in specific partition in a Topic
+    It represents the latest message read by the consumer
+
+How Consumer reads data
+
+    When a consumer group reads messages from a topic,
+    Each member of the group maintains its own offset and updates it as it consumes messages
+
+What is __consumer_offset Topic ?
+
+    __consumer_offset is a built-in topic in Apache Kafka that keeps track of the
+        latest offset committed for each partition of each consumer group.
+
+    The topic is internal to the Kafka cluster and not meant to be read or written to directly by clients.
+    Instead, the offset information is stored in the topic and updated by the Kafka broker to reflect the position of each consumer in each partition.
+
+    There is a separate __consumer_offsets topic created for each consumer group.
+    So if you have 2 consumer groups containing 4 consumers each, you will have a total of 2_ consumer_ _offsets topics created.
+
+    The __consumer_offsets topic is used to store the current offset of each consumer in each partition for a given consumer group.
+    Each consumer in the group updates its own offset for the partitions it is assigned in the _consumer_offsets topic,
+    and the group coordinator uses this information to manage the assignment of partitions to consumers and to ensure that each partition is being consumed by exactly one consumer in the group.
+
+
+What happens when a new Consumer is created ?
+
+    When a consumer joins a consumer group, it sends a join request to the group coordinator.
+    The group coordinator determines which partitions the consumer should be assigned based on the number of consumers in the group and the current assignment of partitions to consumers.
+    The group coordinator then sends a new assignment of partitions to the consumer, which includes the set of partitions that the consumer is responsible for consuming.
+    The consumer starts consuming data from the assigned partitions.
+
+    It is important to note that consumers in a consumer group are always assigned partitions in a "sticky" fashion, meaning that a consumer will continue to be assigned the same partitions as long as it remains in the group. This allows consumers to maintain their position in the topic and continue processing where they left off,
+    even after a rebalance.
+
+    If we have multiple consumer groups
+
+
+
+
+
+========================================================================================================================
+
+🟢 INSTALLATION COMMANDS
+
+    zookeeper-server-start.bat ..\..\config\zookeeper.properties
+
+    kafka-server-start.bat ..\..\config\server.properties
+
+    kafka-topics.bat --create --topic my-topic --bootstrap-server localhost:9092 --replication-factor 1 --partitions 3
+
+    kafka-console-producer.bat --broker-list localhost:9092 --topic my-topic
+
+    kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic my-topic --from-beginning
+
+    Detail : --from-beginning means Start from the beginning consume all the data which are publishes by the Producer,
+                if this property is not set then consumer will start consuming from  new data
+
+🟢 SENDING MESSAGES COMMANDS
+
+    zookeeper-server-start.bat ..\..\config\zookeeper.properties
+
+    kafka-server-start.bat ..\..\config\server.properties
+
+    kafka-topics.bat --create --topic foods --bootstrap-server localhost:9092 --replication-factor 1 --partitions 4
+
+    kafka-console-producer.bat --broker-list localhost:9092 --topic foods --property "key.separator=-" --property "parse.key=true"
+
+    kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic foods --from-beginning -property "key.separator=-" --property "print.key=false"

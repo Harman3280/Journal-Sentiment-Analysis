@@ -1,0 +1,22 @@
+spring.application.name= JournalApp
+server.port=9191
+
+
+############# MONGO DB CONFIG #############
+
+
+
+spring.data.mongodb.uri = mongodb+srv://harmansingh:harman123@cluster0.syb8f.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+spring.data.mongodb.database=journaldb
+spring.data.mongodb.auto-index-creation=true
+
+#If our server is deployed on remote server use a URI property above otherwise below one
+
+#spring.data.mongodb.host=localhost
+#spring.data.mongodb.port=27017
+#spring.data.mongodb.username=myUsername
+#spring.data.mongodb.password=password
+
+
+
+

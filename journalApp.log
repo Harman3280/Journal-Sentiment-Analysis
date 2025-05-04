@@ -1,0 +1,1 @@
+13:09:32.508 [scheduling-1] INFO  org.mongodb.driver.connection {36} -Opened connection [connectionId{localValue:302, serverValue:117357}] to cluster0-shard-00-02.syb8f.mongodb.net:27017 
