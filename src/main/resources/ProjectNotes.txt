@@ -633,6 +633,16 @@ Check Your Java interview Prep doc on Google Docs for detail.
 
     6. To interact with Redis, Spring provides us "RedisTemplate"
 
+############ KAFKA FOR EMAIL SERVICE #######
+
+GOAL : We will decouple mail service in our UserScheduler.java > fetchUsersAndSendSAMail()
+       Producer : fetchUsersAndSendSAMail-- So mail send task will be produce to kafka topic.
+       Consumer :
+       Topic    : weekly-sentiments
+
+    1. Add spring-kafka dependency in POM file
+    2.
+
 
 
 

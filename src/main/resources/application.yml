@@ -4,6 +4,15 @@ server:
   application:
     name: JournalApp_Main
 
+logging:
+  level:
+    org:
+      example: DEBUG
+
+weather:
+  api:
+    key: 32aebc252d492117abb932062109971c
+
 spring:
 #  REDIS PROPERTY
   redis:
@@ -13,14 +22,39 @@ spring:
 #  ACTIVE PROFILE PROPERTY
   profiles:
     active: dev
+  kafka:
+    bootstrap-servers: pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: weekly-sentiment-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: org.example.model
+      request:
+        timeout:
+          ms: 30000
+      session:
+        timeout:
+          ms: 30000
+
+    properties:
+      security:
+        protocol: SASL_SSL
+      sasl:
+        mechanism: PLAIN
+        jaas:
+          config: org.apache.kafka.common.security.plain.PlainLoginModule required username='M7VQTOVME2T7DN7U' password='5aCuk48qlZeSGvGkZVgdFmbUMtP5CECtLHTD5q+xFNUbt8/7d6T8pZ1lkosbfgW/';
+      session:
+        timeout:
+          ms: 45000
 
 
 
-logging:
-  level:
-    org:
-      example: DEBUG
-
-weather:
-  api:
-    key: 32aebc252d492117abb932062109971c
+#client:
+#   id : ccloud-springboot-client-704ab342-aec4-420b-be12-118c6230ecc8
