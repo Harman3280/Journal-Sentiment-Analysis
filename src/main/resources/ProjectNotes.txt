@@ -711,3 +711,40 @@ Check Your Java interview Prep doc on Google Docs for detail.
         Fix : add correct mongo dependency :     <artifactId>mongodb-driver-sync</artifactId>
 
 
+
+###########################  Deploy Spring Boot App on Cloud / Heroku ###########################
+
+        1. On our Local machine, our code is first packaged using, mvn package
+        2. Then we run the jar using command "java -jar JAR_NAME" which has embedded Tomcat server inside.
+        3. Cloud Options : Amazon EC2 or GCP, but we will use heroku (does step 1 and 2 automatically)
+
+
+        1. WE HAVE INSTALLED GIT
+        2. WE HAVE INSTALLED HEROKU CLI
+        3. WE HAVE USED 'HEROKU LOGIN' COMMAND
+                TO LOGIN TO HEROKU
+        4. NOW WE WILL CLONE OUR SPRINGBOOT REPOSITORY
+        5. heroku create command create an app on the heroku cloud where our app will be live
+
+
+####################### Kusho AI ############################
+
+    1. Used for API Testing
+    2. Agent can generate multiple test cases
+
+
+#######################=== Confluent Cloud API key ===#######################
+
+        API key:
+        M7VQTOVME2T7DN7U
+
+        API secret:
+        5aCuk48qlZeSGvGkZVgdFmbUMtP5CECtLHTD5q+xFNUbt8/7d6T8pZ1lkosbfgW/
+
+        Resource:
+        lkc-3gm2qm
+
+        Bootstrap server:
+        pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092
+
+
