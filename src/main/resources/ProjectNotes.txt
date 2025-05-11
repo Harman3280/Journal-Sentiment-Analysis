@@ -2,7 +2,7 @@
 
 ############ DEPENDENCIES ---
 
-<!--    SpringBoot 2.7.16 works with spring security 5 and Java 1.8 or higher
+<!--   Current Project  : SpringBoot 2.7.16 works with spring security 5 and Java 1.8 or higher
 and     SpringBoot 3.x works with spring security 6 and Java 17 or higher-->
 
 1. Spring-Boot-Starter-Data-Mongodb :
@@ -24,6 +24,24 @@ and     SpringBoot 3.x works with spring security 6 and Java 17 or higher-->
                <groupId>org.springframework.kafka</groupId>
                <artifactId>spring-kafka</artifactId>
            </dependency>
+
+6.  <!--        JWT DEPENDENCY-->
+            <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.5</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>0.12.5</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>0.12.5</version>
+                <scope>runtime</scope>
+            </dependency>
 
 
 ########## Mongo DB ###########
@@ -279,6 +297,39 @@ Bonus 💡
                      userRepository.deleteByUserName(authentication.getName());
 
 
+########################################    JWT TOKEN     ########################################
+
+    1.  JWT is a way to securely transmit information between parties as a JSON object
+    2. Compact and URL-safe token. Uses Base64 encoding
+    3. Consists of 3 parts separated by dots : HEADER, PAYLOAD and SIGNATURE
+
+        >>>>>>>>>Header
+        The header typically consists of two parts: the type of the token (JWT) and the signing algorithm being used, such as HMAC SHA256 or RSA.
+
+        Example
+        {
+            "alg": "HS256",
+            "typ": "JWT"
+        }
+
+         >>>>>>>>> Payload : The data we are sending
+         {
+             "email": "email@gmail.com",
+             "name": "John Doe",
+         }
+
+         >>>>>>>>>  Signature
+         The signature is used to verify that the sender of the JWT is who it says it is and to ensure that the message wasn't changed along the way.
+         To create the signature part, you have to take the encoded header, the encoded payload, a secret, the algorithm specified in the header, and sign that.
+
+        HMACSHA256(
+        secret,
+        base64UrlEncode(header) + "." + base64UrlEncode(payload)
+
+
+    4.  if we were using httpBasicAuthentication, we encode username:password in Base64 and pass that in Authorization Header, which can be easily decode.
+    5.  Now we don't need to send user credentials in each request and we can set TTl for JWT token, we can also send extra data with JWT.
+
 
 
 
@@ -429,6 +480,8 @@ Bonus 💡
         }
 
     and in our application properties : spring.profiles.active= prod
+
+
 ################## Logging ################
 
 We can don logging using
@@ -656,5 +709,42 @@ Check Your Java interview Prep doc on Google Docs for detail.
         Unsatisfied dependency expressed through method 'mongoTemplate' parameter 0; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'mongoDatabaseFactory' defined in class path resource [org/sp
 
         Fix : add correct mongo dependency :     <artifactId>mongodb-driver-sync</artifactId>
+
+
+
+###########################  Deploy Spring Boot App on Cloud / Heroku ###########################
+
+        1. On our Local machine, our code is first packaged using, mvn package
+        2. Then we run the jar using command "java -jar JAR_NAME" which has embedded Tomcat server inside.
+        3. Cloud Options : Amazon EC2 or GCP, but we will use heroku (does step 1 and 2 automatically)
+
+
+        1. WE HAVE INSTALLED GIT
+        2. WE HAVE INSTALLED HEROKU CLI
+        3. WE HAVE USED 'HEROKU LOGIN' COMMAND
+                TO LOGIN TO HEROKU
+        4. NOW WE WILL CLONE OUR SPRINGBOOT REPOSITORY
+        5. heroku create command create an app on the heroku cloud where our app will be live
+
+
+####################### Kusho AI ############################
+
+    1. Used for API Testing
+    2. Agent can generate multiple test cases
+
+
+#######################=== Confluent Cloud API key ===#######################
+
+        API key:
+        M7VQTOVME2T7DN7U
+
+        API secret:
+        5aCuk48qlZeSGvGkZVgdFmbUMtP5CECtLHTD5q+xFNUbt8/7d6T8pZ1lkosbfgW/
+
+        Resource:
+        lkc-3gm2qm
+
+        Bootstrap server:
+        pkc-l7pr2.ap-south-1.aws.confluent.cloud:9092
 
 

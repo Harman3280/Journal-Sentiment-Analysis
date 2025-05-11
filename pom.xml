@@ -81,6 +81,25 @@ and     SpringBoot 3.x works with spring security 6 and Java 17 or higher-->
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
+<!--        JWT DEPENDENCY-->
+        <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-api</artifactId>
+        <version>0.12.5</version>
+        </dependency>
+
+<!--        JACKSON JSON PROCESSING LIBRARY-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.5</version>
+            <scope>runtime</scope>
+        </dependency>
 
     </dependencies>
 
