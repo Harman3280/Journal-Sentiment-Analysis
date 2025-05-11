@@ -71,11 +71,16 @@ public class UserScheduler {
 
             if(mostFrequentSentiment != null) {
                 // Below task moved to SentimentConsumerService
-                //emailService.sendEmail(user.getEmail(), "Sentiment for Last 7 days", mostFrequentSentiment.toString());
 
                 SentimentData sentimentData = SentimentData.builder()
                         .email(user.getEmail()).sentiment(" Sentiment for Last 7 days " + mostFrequentSentiment).build();
-                kafkaTemplate.send("weekly-sentiments", sentimentData.getEmail(), sentimentData);
+
+                //Adding fallback for Kafka
+                try {
+                    kafkaTemplate.send("weekly-sentiments", sentimentData.getEmail(), sentimentData);
+                } catch (Exception e) {
+                    emailService.sendEmail(sentimentData.getEmail(), "Sentiment for previous week", sentimentData.getSentiment());
+                }
             }
         }
     }

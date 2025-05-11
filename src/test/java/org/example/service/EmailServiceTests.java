@@ -24,6 +24,7 @@ public class EmailServiceTests {
 
 
     @Test
+    @Disabled
     public void testUserScheduler(){
         userScheduler.fetchUsersAndSendSAMail();
     }

@@ -636,12 +636,17 @@ Check Your Java interview Prep doc on Google Docs for detail.
 ############ KAFKA FOR EMAIL SERVICE #######
 
 GOAL : We will decouple mail service in our UserScheduler.java > fetchUsersAndSendSAMail()
-       Producer : fetchUsersAndSendSAMail-- So mail send task will be produce to kafka topic.
-       Consumer :
+       Producer : UserScheduler.java -- fetchUsersAndSendSAMail()-- So mail send task will be produce to kafka topic.
+       Consumer : Created SentimentConsumerService
        Topic    : weekly-sentiments
+       Confluent Dashboard : https://confluent.cloud/home -- google account
+
+    Config Added in Application Property
 
     1. Add spring-kafka dependency in POM file
-    2.
+    2. Now using KafkaTemplate in UserScheduler.java,  we will send emails to the kafka queue in the scheduler.
+    3. And after adding it will be continuously consumed by our SentimentConsumerService consumer.
+    4. Added Fallback also, if Kafka is down, then mails will be sent asynchronously.
 
 
 
